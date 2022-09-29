@@ -14,6 +14,7 @@
 #
 
 import requests
+from requests.exceptions import ConnectionError
 
 from mycroft.tts import TTSValidator
 from mycroft.tts.remote_tts import RemoteTTS
@@ -49,10 +50,10 @@ class CoquiTTSValidator(TTSValidator):
 
     def validate_connection(self):
         try:
-            resp = requests.get(self.tts.url + "/health", verify=False)
+            resp = requests.get(self.tts.url + "/health", verify=False, timeout=1)
             if resp.status_code == 200:
                 return True
-        except Exception:
+        except (Exception, ConnectionError):
             raise Exception(
                 'CoquiTTS server could not be verified. Check your connection '
                 'to the server: ' + self.tts.url)
